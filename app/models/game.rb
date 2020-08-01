@@ -5,7 +5,7 @@ class Game < ApplicationRecord
   validates :width, :height, :bombs, :state, presence: true
   validates :width, :height, :bombs, numericality: {
     only_integer: true,
-    greater_than: 10
+    greater_than_or_equal_to: 10
   }
 
   before_validation :set_defaults
