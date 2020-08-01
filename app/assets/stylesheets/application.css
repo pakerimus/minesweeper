@@ -11,5 +11,16 @@
  * It is generally better to create a new file per style scope.
  *
  *= require_tree .
+ *= require element-ui/lib/theme-chalk/index
  *= require_self
  */
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i|Quicksand:300,400,500,700');
+
+body {
+  font-family: 'Open Sans', serif;
+  text-align: center;
+}
+
+h1, h2, h3, h4, .el-header {
+  font-family: 'Quicksand', serif;
+}

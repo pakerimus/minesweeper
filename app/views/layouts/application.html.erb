@@ -5,8 +5,9 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= stylesheet_packs_with_chunks_tag 'application', 'minesweeper', media: 'all' %>
-    <%= javascript_packs_with_chunks_tag 'application', 'minesweeper' %>
+    <%= stylesheet_link_tag 'application', media: 'all' %>
+    <%= stylesheet_packs_with_chunks_tag 'application', media: 'all' %>
+    <%= javascript_packs_with_chunks_tag 'application' %>
   </head>
 
   <body>
