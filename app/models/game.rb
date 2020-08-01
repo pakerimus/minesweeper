@@ -1,8 +1,9 @@
 class Game < ApplicationRecord
   belongs_to :user
+  has_many :cells
 
-  validates :width, :heigth, :bombs, :state, presence: true
-  validates :width, :heigth, :bombs, numericality: {
+  validates :width, :height, :bombs, :state, presence: true
+  validates :width, :height, :bombs, numericality: {
     only_integer: true,
     greater_than: 10
   }
