@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 2020_08_01_200841) do
     t.integer "height", null: false
     t.integer "bombs", null: false
     t.string "state", null: false
-    t.integer "total_time"
+    t.integer "total_time", default: 0, null: false
     t.datetime "last_started_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
