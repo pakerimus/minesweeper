@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get 'pages/index'
+  resources :users, only: :create
 
   root 'pages#index'
 end

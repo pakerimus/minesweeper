@@ -11,7 +11,7 @@ require("channels")
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 import ElementUI          from 'element-ui';
-import locale             from 'element-ui/lib/locale/lang/es'
+import locale             from 'element-ui/lib/locale/lang/en'
 import VueTurbolinks      from 'vue-turbolinks'
 
 // import 'element-ui/lib/theme-chalk/index.css';
