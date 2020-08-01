@@ -13,4 +13,20 @@ class Game < ApplicationRecord
   def set_defaults
     state ||= "pending"
   end
+
+  def plays_available
+    cells.normal.not_cleared.count
+  end
+
+  def place_bombs(starting_cell)
+    bombs.times do
+      column = rand(width)
+      row = rand(height)
+      cell = nil
+      while !cell
+        cell = game.cells.normal.reload.where.not(id: starting_cell.id).find_by(column: column, row: row)
+      end
+      random_normal_cell.place_bomb!
+    end
+  end
 end

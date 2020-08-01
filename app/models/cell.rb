@@ -16,4 +16,42 @@ class Cell < ApplicationRecord
   scope :not_cleared, -> { where(cleared: false) }
 
   scope :by_position, ->(row, column) { where(row: row, column: column) }
+
+  def cycle_mark
+    next_index = Cell.marks.keys.find_index(mark) + 1
+    next_index = 0 if next_index == Cell.marks.count
+    self.mark = Cell.marks.keys[next_index]
+  end
+
+  def cycle_mark!
+    cycle_mark
+    save!
+  end
+
+  def without_adjacent_bombs?
+    adjacent_bombs.zero?
+  end
+
+  def can_be_cleared?
+    return false if cleared?
+
+    no_mark?
+  end
+
+  def clear!
+    update!(cleared: true)
+  end
+
+  def place_bomb!
+    update!(bomb: true)
+  end
+
+  def adjacent_cells
+    game.cells.by_position([row-1..row+1], [column-1..column+1])
+  end
+
+  def calculate_adjacent_bombs
+    bombs = adjacent_cells.where.not(id: id).bombs.count
+    update(adjacent_bombs: bombs)
+  end
 end
