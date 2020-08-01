@@ -1,6 +1,6 @@
 class Api::GamesController < ApiController
   before_action :set_user
-  before_action :set_game, only: [:show]
+  before_action :set_game, only: [:show, :execute]
 
   def index
     render json: { games: @user.games }, status: 200
@@ -9,6 +9,7 @@ class Api::GamesController < ApiController
   def create
     @game = user.games.new(game_params)
     if @game.save
+      GameService::Base.new(@game, params).create_board!
       render json: { game: @game }, status: 201
     else
       render json: { error: @game.errors.full_messages.to_sentence }, status: 400
@@ -17,6 +18,11 @@ class Api::GamesController < ApiController
 
   def show
     render json: { game: @game }, status: 200
+  end
+
+  def execute
+    status, message = GameService::Base.new(@game, params).execute_action!
+    render json: { result: message }, status: (status ? 200 : 422)
   end
 
   private
