@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  resources :users, only: :create
+  namespace :api do
+    resources :users, only: :create
+  end
+
+  get 'pages/index'
 
   root 'pages#index'
 end

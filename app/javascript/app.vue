@@ -48,7 +48,7 @@ export default {
       console.log('send username', this.user.name);
       if (this.user.name) {
         this.loading = true;
-        this.$http.post("/users", { user: {name: this.user.name} })
+        this.$http.post("/api/users", { user: {name: this.user.name} })
           .then(response => {
             console.log("user response", response.body);
             this.user.id = response.body.user.id;
