@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "Games", type: :request do
   let(:user) { create(:user) }
   let(:another_user) { create(:user) }
-  let!(:game) { create(:game, :with_cells, user: user) }
+  let!(:game) { create(:game, user: user) }
 
   describe "GET index" do
     context "when the user is correct" do
