@@ -8,11 +8,13 @@ class Game < ApplicationRecord
     greater_than_or_equal_to: 10
   }
 
+  DEFAULT_STATE = 'pending'.freeze
+
   before_validation :set_defaults
   after_create :create_board
 
   def set_defaults
-    self.state ||= "pending"
+    self.state ||= DEFAULT_STATE
   end
 
   def create_board
