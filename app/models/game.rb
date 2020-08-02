@@ -9,9 +9,14 @@ class Game < ApplicationRecord
   }
 
   before_validation :set_defaults
+  after_create :create_board
 
   def set_defaults
     state ||= "pending"
+  end
+
+  def create_board
+    GameService::Game.new(self).create_board!
   end
 
   def plays_available

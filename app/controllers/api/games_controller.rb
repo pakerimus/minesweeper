@@ -9,7 +9,6 @@ class Api::GamesController < ApiController
   def create
     @game = user.games.new(game_params)
     if @game.save
-      GameService::Base.new(@game, params).create_board!
       render json: { game: @game }, status: 201
     else
       render json: { error: @game.errors.full_messages.to_sentence }, status: 400
@@ -21,7 +20,7 @@ class Api::GamesController < ApiController
   end
 
   def execute
-    status, message = GameService::Base.new(@game, params).execute_action!
+    status, message = GameService::Game.new(@game, params).execute_action!
     render json: { result: message }, status: (status ? 200 : 422)
   end
 

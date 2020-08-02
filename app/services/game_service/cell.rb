@@ -39,7 +39,7 @@ module GameService
       end
 
       def clear_adjacent_cells
-        # adjacent cells include own
+        # adjacent cells includes itself
         cell.adjacent_cells.map(&:clear!)
       end
 
