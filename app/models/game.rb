@@ -12,7 +12,7 @@ class Game < ApplicationRecord
   after_create :create_board
 
   def set_defaults
-    state ||= "pending"
+    self.state ||= "pending"
   end
 
   def create_board

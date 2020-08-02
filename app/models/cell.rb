@@ -8,6 +8,7 @@ class Cell < ApplicationRecord
   }
 
   validates :row, :column, presence: true, numericality: { only_integer: true }
+  validates :game_id, uniqueness: { scope: [:row, :column] }
 
   scope :bombs, -> { where(bomb: true) }
   scope :normal, -> { where(bomb: false) }
@@ -17,10 +18,14 @@ class Cell < ApplicationRecord
 
   scope :by_position, ->(row, column) { where(row: row, column: column) }
 
-  def cycle_mark
+  def next_mark
     next_index = Cell.marks.keys.find_index(mark) + 1
     next_index = 0 if next_index == Cell.marks.count
-    self.mark = Cell.marks.keys[next_index]
+    Cell.marks.keys[next_index]
+  end
+
+  def cycle_mark
+    self.mark = next_mark
   end
 
   def cycle_mark!
