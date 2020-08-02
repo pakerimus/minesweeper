@@ -16,16 +16,27 @@ module GameService
     end
 
     def execute_action!
-      send(options[:action_name])
+      validate_action!
+      send(options[:game_action].to_sym)
       [true, 'ok']
     rescue StandardError => e
       [false, e.message]
     end
 
+    def validate_action!
+      raise 'Invalid action' unless self.respond_to?(options[:game_action].to_sym)
+      raise 'Not allowed: Game has finished' if game.finished?
+
+      if ['start', 'continue'].includes?(options[:game_action]) && started? ||
+         options[:game_action] == 'pause' && paused?
+        raise 'Not allowed: redundant'
+      end
+    end
+
     def start
       starting_cell = game.cells.by_position(options[:row], options[:column]).take
       game.place_bombs(starting_cell)
-      game.cells.map(&:calculate_adjacent_bombs)
+      game.cells.normal.map(&:calculate_adjacent_bombs)
       starting_cell.clear!
       game.update(state: 'started', last_started_at: Time.zone.now)
     end

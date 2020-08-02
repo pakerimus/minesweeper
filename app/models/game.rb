@@ -10,6 +10,15 @@ class Game < ApplicationRecord
 
   DEFAULT_STATE = 'pending'.freeze
 
+  enum state: {
+    pending: 'pending',
+    started: 'started',
+    paused: 'paused',
+    abandoned: 'abandoned',
+    lost: 'lost',
+    won: 'won'
+  }
+
   before_validation :set_defaults
   after_create :create_board
 
@@ -23,6 +32,10 @@ class Game < ApplicationRecord
 
   def available_plays
     cells.normal.not_cleared.count
+  end
+
+  def finished?
+    abandoned? || lost? || won?
   end
 
   def place_bombs(starting_cell)
