@@ -16,7 +16,7 @@ class Api::GamesController < ApiController
   end
 
   def show
-    render json: { game: @game }, status: 200
+    render json: { game: @game, cells: @game.cells }, status: 200
   end
 
   def execute

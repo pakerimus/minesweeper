@@ -14,29 +14,24 @@
             </el-form-item>
           </el-form>
         </div>
-        <div v-if="user.id">
-          <el-page-header @back="clearUser" :content="title" />
-          game list
-        </div>
+        <game-list v-if="user.id" :user="user" @clearUser="() => clearUser()"/>
       </div>
     </el-main>
   </el-container>
 </template>
 
 <script>
+import GameList from "./gameList";
+
 export default {
+  components: { GameList },
   data: function () {
     return {
       loading: false,
       user: {
         id: null,
-        name: null
+        name: "paker"
       }
-    }
-  },
-  computed: {
-    title() {
-      return `${this.user.name}'s games`
     }
   },
   methods: {
