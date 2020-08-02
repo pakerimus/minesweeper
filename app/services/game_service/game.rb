@@ -47,7 +47,7 @@ module GameService
     end
 
     def calculate_remaining_plays
-      finish_with_state('won') if game.plays_available.zero?
+      finish_with_state('won') if game.available_plays.zero?
     end
 
     private

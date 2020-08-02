@@ -19,18 +19,14 @@ class Game < ApplicationRecord
     GameService::Game.new(self).create_board!
   end
 
-  def plays_available
+  def available_plays
     cells.normal.not_cleared.count
   end
 
   def place_bombs(starting_cell)
+    eligible_cells = cells.normal.where.not(id: starting_cell.id)
     bombs.times do
-      column = rand(width)
-      row = rand(height)
-      cell = nil
-      while !cell
-        cell = game.cells.normal.reload.where.not(id: starting_cell.id).find_by(column: column, row: row)
-      end
+      random_normal_cell = eligible_cells.reload.sample
       random_normal_cell.place_bomb!
     end
   end

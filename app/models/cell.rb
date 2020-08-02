@@ -19,7 +19,7 @@ class Cell < ApplicationRecord
   scope :by_position, ->(row, column) { where(row: row, column: column) }
 
   def next_mark
-    next_index = Cell.marks.keys.find_index(mark) + 1
+    next_index = Cell.marks.keys.find_index(mark || 'no_mark') + 1
     next_index = 0 if next_index == Cell.marks.count
     Cell.marks.keys[next_index]
   end
