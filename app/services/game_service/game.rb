@@ -28,8 +28,8 @@ module GameService
       raise 'Invalid action' unless self.respond_to?(options["game_action"].to_sym)
       raise 'Not allowed: Game has finished' if game.finished?
 
-      if ['start', 'continue'].include?(options["game_action"]) && started? ||
-         options["game_action"] == 'pause' && paused?
+      if ['start', 'continue'].include?(options["game_action"]) && game.started? ||
+         options["game_action"] == 'pause' && game.paused?
         raise 'Not allowed: redundant'
       end
     end
