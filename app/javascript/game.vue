@@ -148,10 +148,15 @@ export default {
     },
     processResult(result) {
       if (!result) return;
+      this.getGame();
       // if (result == "start_game") this.refreshCells();
       // if (result == "refresh_grid") this.refreshCells();
-      // if (result == "explode") this.getGame();
-      this.getGame();
+      if (result == "won") {
+        this.$alert('Congratulations, you won!');
+      }
+      if (result == "explode") {
+        this.$alert('You lost...');
+      }
     },
     sendCellAction(cell, action) {
       let result = null;
