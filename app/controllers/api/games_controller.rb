@@ -16,7 +16,7 @@ class Api::GamesController < ApiController
   end
 
   def show
-    render json: { game: @game, cells: @game.cells }, status: 200
+    render json: { game: @game, cells: @game.cells.for_grid }, status: 200
   end
 
   def destroy
@@ -25,8 +25,9 @@ class Api::GamesController < ApiController
   end
 
   def execute
-    status, message = GameService::Game.new(@game, params).execute_action!
-    render json: { result: message }, status: (status ? 200 : 422)
+    game_service = GameService::Game.new(@game, **game_action_params)
+    status, message = game_service.execute_action!
+    render json: { result: message, game: @game.reload }, status: (status ? 200 : 422)
   end
 
   private

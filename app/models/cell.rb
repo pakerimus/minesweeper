@@ -17,6 +17,7 @@ class Cell < ApplicationRecord
   scope :not_cleared, -> { where(cleared: false) }
 
   scope :by_position, ->(row, column) { where(row: row, column: column) }
+  scope :for_grid, -> { order(:row, :column) }
 
   DEFAULT_MARK = 'no_mark'.freeze
 
