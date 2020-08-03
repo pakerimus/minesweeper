@@ -4,7 +4,6 @@
 // that code so it'll be compiled.
 
 require("@rails/ujs").start()
-require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
 
@@ -12,19 +11,16 @@ import Vue from 'vue'
 import VueResource from 'vue-resource'
 import ElementUI          from 'element-ui';
 import locale             from 'element-ui/lib/locale/lang/en'
-import VueTurbolinks      from 'vue-turbolinks'
 
-// import 'element-ui/lib/theme-chalk/index.css';
 import 'element-ui/lib/theme-chalk/display.css';
 import 'element-ui/lib/theme-chalk/index.css';
 
 import App from '../app.vue'
 
-Vue.use(VueTurbolinks)
 Vue.use(VueResource)
 Vue.use(ElementUI, { locale })
 
-document.addEventListener('turbolinks:load', () => {
+document.addEventListener('DOMContentLoaded', () => {
   Vue.http.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').content;
   const app = new Vue({
     render: h => h(App),

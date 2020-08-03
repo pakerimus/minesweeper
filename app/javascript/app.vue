@@ -30,7 +30,7 @@ export default {
       loading: false,
       user: {
         id: null,
-        name: "paker"
+        name: null
       }
     }
   },
