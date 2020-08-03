@@ -91,6 +91,8 @@ export default {
           this.cells = response.body.cells;
           if (this.game.state == "pending") {
             this.gameMessage = "Start the game by clicking in any cell"
+          } else {
+            this.gameMessage = this.game.state;
           }
         })
         .catch(error => {
@@ -123,22 +125,51 @@ export default {
       return `grid-template-columns: repeat(${this.game.width}, 40px);`;
     },
     clearCell(cell) {
-      this.sendCellAction(cell, "clear");
+      if (!cell.cleared) this.sendCellAction(cell, "clear");
     },
     cycleCellFlag(cell) {
       this.sendCellAction(cell, "cycle_mark");
     },
     sendGameAction(action) {
-      let mustRefreshBoard = false;
       const url = `${this.gameUrl}/execute`;
-      console.log("sendGameAction", url, action);
-      if (mustRefreshBoard) this.refreshCells();
+      this.$http.post(url, { game: { game_action: action } })
+        .then(response => {
+          this.game.state = response.body.game.state;
+          result = response.body.result;
+          if (result == "refresh_grid") this.refreshCells();
+        })
+        .catch(error => {
+          console.log("sendGameAction error", error);
+          this.$alert(error.body.error, 'Error',  { confirmButtonText: 'OK' });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    processResult(result) {
+      if (!result) return;
+      // if (result == "start_game") this.refreshCells();
+      // if (result == "refresh_grid") this.refreshCells();
+      // if (result == "explode") this.getGame();
+      this.getGame();
     },
     sendCellAction(cell, action) {
-      let mustRefreshBoard = false;
+      let result = null;
       const url = `${this.gameUrl}/cells/${cell.id}/execute`;
-      console.log("sendCellAction", url, action);
-      if (mustRefreshBoard) this.refreshCells();
+      this.$http.post(url, { game: { cell_action: action } })
+        .then(response => {
+          cell.cleared = response.body.cell.cleared;
+          cell.mark = response.body.cell.mark;
+          this.game.state = response.body.game.state;
+          this.processResult(response.body.result);
+        })
+        .catch(error => {
+          console.log("sendCellAction error", error);
+          this.$alert(error.body.error, 'Error',  { confirmButtonText: 'OK' });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     }
   }
 }
