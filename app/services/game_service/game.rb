@@ -33,11 +33,9 @@ module GameService
       end
     end
 
-    def start
-      starting_cell = game.cells.by_position(options[:row], options[:column]).take
+    def start(starting_cell)
       game.place_bombs(starting_cell)
       game.cells.normal.map(&:calculate_adjacent_bombs)
-      starting_cell.clear!
       game.update(state: 'started', last_started_at: Time.zone.now)
     end
 

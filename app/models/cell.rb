@@ -2,9 +2,9 @@ class Cell < ApplicationRecord
   belongs_to :game
 
   enum mark: {
-    no_mark: 'Blank',
-    question: 'Question',
-    with_bomb: 'With bomb'
+    no_mark: 'no_mark',
+    question: 'question',
+    with_bomb: 'with_bomb'
   }
 
   validates :row, :column, presence: true, numericality: { only_integer: true }
@@ -17,6 +17,14 @@ class Cell < ApplicationRecord
   scope :not_cleared, -> { where(cleared: false) }
 
   scope :by_position, ->(row, column) { where(row: row, column: column) }
+
+  DEFAULT_MARK = 'no_mark'.freeze
+
+  before_validation :set_defaults
+
+  def set_defaults
+    self.mark ||= DEFAULT_MARK
+  end
 
   def next_mark
     next_index = Cell.marks.keys.find_index(mark.presence || 'no_mark') + 1

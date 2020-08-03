@@ -12,7 +12,8 @@ class Api::CellsController < ApiController
 
   def execute
     status, message = GameService::Cell.new(@game, @cell, params).execute_action!
-    render json: { result: message }, status: (status ? 200 : 422)
+    json_response = { result: message, game: @game.reload, cell: @cell.reload }
+    render json: json_response, status: (status ? 200 : 422)
   end
 
   private
