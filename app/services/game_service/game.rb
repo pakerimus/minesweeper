@@ -5,6 +5,7 @@ module GameService
     def initialize(game, **options)
       @game = game
       @options = options
+      @game_callback = nil
     end
 
     def create_board!
@@ -17,18 +18,18 @@ module GameService
 
     def execute_action!
       validate_action!
-      send(options[:game_action].to_sym)
-      [true, 'ok']
+      send(options["game_action"].to_sym)
+      [true, @game_callback]
     rescue StandardError => e
       [false, e.message]
     end
 
     def validate_action!
-      raise 'Invalid action' unless self.respond_to?(options[:game_action].to_sym)
+      raise 'Invalid action' unless self.respond_to?(options["game_action"].to_sym)
       raise 'Not allowed: Game has finished' if game.finished?
 
-      if ['start', 'continue'].includes?(options[:game_action]) && started? ||
-         options[:game_action] == 'pause' && paused?
+      if ['start', 'continue'].include?(options["game_action"]) && started? ||
+         options["game_action"] == 'pause' && paused?
         raise 'Not allowed: redundant'
       end
     end
@@ -49,6 +50,7 @@ module GameService
 
     def abandon
       finish_with_state('abandoned')
+      clear_all_cells
     end
 
     def explode
@@ -56,7 +58,12 @@ module GameService
     end
 
     def calculate_remaining_plays
-      finish_with_state('won') if game.available_plays.zero?
+      return unless game.available_plays.zero?
+
+      finish_with_state('won')
+      clear_all_cells
+
+      'won'
     end
 
     private
@@ -67,7 +74,6 @@ module GameService
 
       def finish_with_state(new_state)
         game.update(state: new_state, last_started_at: nil, total_time: total_time)
-        clear_all_cells
       end
 
       def clear_all_cells

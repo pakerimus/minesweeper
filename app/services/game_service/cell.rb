@@ -6,22 +6,23 @@ module GameService
       @game = game
       @cell = cell
       @options = options
+      @cell_callback = nil
     end
 
     def execute_action!
       validate_action!
-      send(options[:cell_action].to_sym)
-      [true, 'ok']
+      send(options["cell_action"].to_sym)
+      [true, @cell_callback]
     rescue StandardError => e
       [false, e.message]
     end
 
     def validate_action!
-      raise 'Invalid action' unless self.respond_to?(options[:cell_action].to_sym)
+      raise 'Invalid action' unless self.respond_to?(options["cell_action"].to_sym)
       raise 'Not allowed: Game has finished' if game.finished?
 
-      raise 'Not allowed: cell cannot be cleared' if options[:cell_action] == "clear" && !cell.can_be_cleared?
-      raise 'Not allowed: cell is cleared' if options[:cell_action] == "cycle_mark" && cell.cleared?
+      raise 'Not allowed: cell cannot be cleared' if options["cell_action"] == "clear" && !cell.can_be_cleared?
+      raise 'Not allowed: cell is cleared' if options["cell_action"] == "cycle_mark" && cell.cleared?
     end
 
     def cycle_mark
@@ -29,31 +30,37 @@ module GameService
     end
 
     def clear
-      game_svc.start(cell) if game.pending?
+      if game.pending?
+        @cell_callback = "start_game"
+        game_svc.start(cell)
+        cell.reload
+      end
 
       clear_cell(cell)
 
-      game_svc.calculate_remaining_plays
+      @cell_callback ||= game_svc.calculate_remaining_plays
     end
 
     private
       def explosion
+        @cell_callback = "explode"
         game_svc.explode
       end
 
       def clear_cell(a_cell)
         return unless a_cell.can_be_cleared?
+
+        a_cell.clear!
         return explosion if a_cell.bomb?
 
-        if a_cell.without_adjacent_bombs?
-          clear_adjacent_cells(a_cell)
-        else
-          a_cell.clear!
-        end
+        clear_adjacent_cells(a_cell)
       end
 
       def clear_adjacent_cells(a_cell)
-        a_cell.adjacent_cells.each do |adjacent_cell|
+        return unless a_cell.without_adjacent_bombs?
+
+        @cell_callback = "refresh_grid"
+        a_cell.adjacent_cells.not_cleared.each do |adjacent_cell|
           clear_cell(adjacent_cell)
         end
       end
