@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="loading">
+  <div>
     <div v-if="game.id" >
       <el-page-header @back="goBack" title="Go back">
         <template slot="content">
@@ -20,7 +20,7 @@
           <el-col :span="8"><span>Timer</span></el-col>
         </el-row>
         <hr>
-        <div id="game-board">
+        <div v-loading="loading" id="game-board">
           <div class="game-grid" :style="getGridStyle()">
             <cell
               v-for="(cell, i) in cells"
@@ -131,6 +131,7 @@ export default {
       this.sendCellAction(cell, "cycle_mark");
     },
     sendGameAction(action) {
+      this.loading = true;
       const url = `${this.gameUrl}/execute`;
       this.$http.post(url, { game: { game_action: action } })
         .then(response => {
@@ -161,7 +162,7 @@ export default {
     sendCellAction(cell, action) {
       if (cell.cleared) return;
 
-      let result = null;
+      this.loading = true;
       const url = `${this.gameUrl}/cells/${cell.id}/execute`;
       this.$http.post(url, { game: { cell_action: action } })
         .then(response => {
