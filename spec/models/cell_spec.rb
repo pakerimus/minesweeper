@@ -20,29 +20,29 @@ RSpec.describe Cell, type: :model do
     context 'when mark is nil' do
       let(:mark) { nil }
 
-      it { is_expected.to eq 'question' }
+      it { is_expected.to eq 'with_bomb' }
     end
 
     context "when mark is blank" do
       let(:mark) { '' }
 
-      it { is_expected.to eq 'question' }
+      it { is_expected.to eq 'with_bomb' }
     end
 
     context "when mark is no_mark" do
       let(:mark) { 'no_mark' }
-
-      it { is_expected.to eq 'question' }
-    end
-
-    context "when mark is question" do
-      let(:mark) { 'question' }
 
       it { is_expected.to eq 'with_bomb' }
     end
 
     context "when mark is with_bomb" do
       let(:mark) { 'with_bomb' }
+
+      it { is_expected.to eq 'question' }
+    end
+
+    context "when mark is question" do
+      let(:mark) { 'question' }
 
       it { is_expected.to eq 'no_mark' }
     end

@@ -3,8 +3,8 @@ class Cell < ApplicationRecord
 
   enum mark: {
     no_mark: 'no_mark',
-    question: 'question',
-    with_bomb: 'with_bomb'
+    with_bomb: 'with_bomb',
+    question: 'question'
   }
 
   validates :row, :column, presence: true, numericality: { only_integer: true }
