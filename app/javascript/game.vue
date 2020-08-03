@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading">
     <div v-if="game.id" >
-      <el-page-header @back="goBack" :content="title" />
+      <el-page-header @back="goBack" title="Go back" :content="title" />
       <div class="page-content">
         {{ game }}
         <hr>

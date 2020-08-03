@@ -40,12 +40,10 @@ export default {
       this.user.name = null;
     },
     findUser() {
-      console.log('send username', this.user.name);
       if (this.user.name) {
         this.loading = true;
         this.$http.post("/api/users", { user: {name: this.user.name} })
           .then(response => {
-            console.log("user response", response.body);
             this.user.id = response.body.user.id;
             this.user.name = response.body.user.name;
           })

@@ -1,13 +1,13 @@
 class Api::GamesController < ApiController
   before_action :set_user
-  before_action :set_game, only: [:show, :execute]
+  before_action :set_game, only: [:show, :destroy, :execute]
 
   def index
     render json: { games: @user.games }, status: 200
   end
 
   def create
-    @game = user.games.new(game_params)
+    @game = @user.games.new(game_params)
     if @game.save
       render json: { game: @game }, status: 201
     else
@@ -17,6 +17,11 @@ class Api::GamesController < ApiController
 
   def show
     render json: { game: @game, cells: @game.cells }, status: 200
+  end
+
+  def destroy
+    @game.destroy!
+    head 200
   end
 
   def execute
