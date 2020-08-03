@@ -9,14 +9,19 @@ class Api::GamesController < ApiController
   def create
     @game = @user.games.new(game_params)
     if @game.save
-      render json: { game: @game }, status: 201
+      render json: { game: @game, plays: @game.available_plays }, status: 201
     else
       render json: { error: @game.errors.full_messages.to_sentence }, status: 400
     end
   end
 
   def show
-    render json: { game: @game, cells: @game.cells.for_grid }, status: 200
+    json_response = {
+      game: @game,
+      plays: @game.available_plays,
+      cells: @game.cells.for_grid
+    }
+    render json: json_response, status: 200
   end
 
   def destroy
@@ -27,7 +32,12 @@ class Api::GamesController < ApiController
   def execute
     game_service = GameService::Game.new(@game, **game_action_params)
     status, message = game_service.execute_action!
-    render json: { result: message, game: @game.reload }, status: (status ? 200 : 422)
+    json_response = {
+      result: message,
+      game: @game.reload,
+      plays: @game.available_plays
+    }
+    render json: json_response, status: (status ? 200 : 422)
   end
 
   private

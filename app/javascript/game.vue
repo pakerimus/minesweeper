@@ -15,9 +15,21 @@
       <el-divider />
       <div class="page-content">
         <el-row :gutter="20">
-          <el-col :span="8"><span>Actions</span></el-col>
-          <el-col :span="8">{{ gameMessage }}</el-col>
-          <el-col :span="8"><span>Timer</span></el-col>
+          <el-col :span="8">
+            <el-button-group>
+              <el-button type="primary">Abandon</el-button>
+              <el-button type="primary">Pause</el-button>
+              <el-button type="primary">Continue</el-button>
+            </el-button-group>
+          </el-col>
+          <el-col :span="8">
+            <h3>{{ gameMessage }}</h3>
+          </el-col>
+          <el-col :span="8">
+            <span>Plays: {{ plays }}</span>
+            <el-divider direction="vertical" />
+            <span>Timer: {{ timer }}</span>
+          </el-col>
         </el-row>
         <hr>
         <div v-loading="loading" id="game-board">
@@ -57,6 +69,8 @@ export default {
     return {
       loading: false,
       gameMessage: null,
+      timer: 0,
+      plays: 0,
       game: {
         id: null,
         state: null,
@@ -89,10 +103,11 @@ export default {
         .then(response => {
           this.game = response.body.game;
           this.cells = response.body.cells;
+          this.plays = response.body.plays;
           if (this.game.state == "pending") {
             this.gameMessage = "Start the game by clicking in any cell"
           } else {
-            this.gameMessage = this.game.state;
+            this.gameMessage = `Game ${this.game.state}`;
           }
         })
         .catch(error => {
@@ -136,8 +151,8 @@ export default {
       this.$http.post(url, { game: { game_action: action } })
         .then(response => {
           this.game.state = response.body.game.state;
-          result = response.body.result;
-          if (result == "refresh_grid") this.refreshCells();
+          this.plays = response.body.plays;
+          this.processResult(response.body.result);
         })
         .catch(error => {
           console.log("sendGameAction error", error);
@@ -169,6 +184,7 @@ export default {
           cell.cleared = response.body.cell.cleared;
           cell.mark = response.body.cell.mark;
           this.game.state = response.body.game.state;
+          this.plays = response.body.plays;
           this.processResult(response.body.result);
         })
         .catch(error => {

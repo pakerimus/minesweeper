@@ -13,7 +13,12 @@ class Api::CellsController < ApiController
   def execute
     cell_service = GameService::Cell.new(@game, @cell, **game_action_params)
     status, message = cell_service.execute_action!
-    json_response = { result: message, game: @game.reload, cell: @cell.reload }
+    json_response = {
+      result: message,
+      game: @game.reload,
+      cell: @cell.reload,
+      plays: @game.available_plays
+    }
     render json: json_response, status: (status ? 200 : 422)
   end
 
