@@ -145,9 +145,9 @@ export default {
     createGame() {
       this.loading = true;
       this.$http.post(`/api/users/${this.user.id}/games`, { game: this.newGame })
-        .then(() => {
-          this.getGameList();
+        .then((response) => {
           this.newGameDialogVisible = false;
+          this.setGame(response.body.game.id);
         })
         .catch(error => {
           console.log("user error", error);

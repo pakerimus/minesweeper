@@ -125,7 +125,7 @@ export default {
       return `grid-template-columns: repeat(${this.game.width}, 40px);`;
     },
     clearCell(cell) {
-      if (!cell.cleared) this.sendCellAction(cell, "clear");
+      this.sendCellAction(cell, "clear");
     },
     cycleCellFlag(cell) {
       this.sendCellAction(cell, "cycle_mark");
@@ -159,6 +159,8 @@ export default {
       }
     },
     sendCellAction(cell, action) {
+      if (cell.cleared) return;
+
       let result = null;
       const url = `${this.gameUrl}/cells/${cell.id}/execute`;
       this.$http.post(url, { game: { cell_action: action } })
