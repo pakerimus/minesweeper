@@ -1,6 +1,8 @@
 <template>
   <el-container>
-    <el-header>MINESWEEPER</el-header>
+    <el-header>
+      <h1>MINESWEEPER</h1>
+    </el-header>
     <el-main>
       <div id="app" v-loading="loading">
         <div v-if="!user.id">
