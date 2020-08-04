@@ -20,7 +20,6 @@
             <el-table-column prop="width" label="Width" />
             <el-table-column prop="height" label="Height" />
             <el-table-column prop="bombs" label="Bombs" />
-            <el-table-column prop="last_started_at" label="Last started at" />
             <el-table-column prop="total_time" label="Total time" />
             <el-table-column>
               <template slot-scope="scope">

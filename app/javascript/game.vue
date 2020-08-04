@@ -16,11 +16,12 @@
       <div class="page-content">
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-button-group>
-              <el-button type="primary">Abandon</el-button>
-              <el-button type="primary">Pause</el-button>
-              <el-button type="primary">Continue</el-button>
+            <el-button-group v-if="gamePlayable">
+              <el-button type="warning" @click="abandonGame">Abandon</el-button>
+              <el-button :disabled="gamePaused" type="primary" @click="pauseGame">Pause</el-button>
+              <el-button :disabled="!gamePaused" type="primary" @click="continueGame">Continue</el-button>
             </el-button-group>
+            <span v-if="!gamePlayable">No actions available</span>
           </el-col>
           <el-col :span="8">
             <h3>{{ gameMessage }}</h3>
@@ -33,7 +34,8 @@
         </el-row>
         <hr>
         <div v-loading="loading" id="game-board">
-          <div class="game-grid" :style="getGridStyle()">
+          <h1 v-if="gamePaused">Game paused</h1>
+          <div v-if="!gamePaused" class="game-grid" :style="getGridStyle()">
             <cell
               v-for="(cell, i) in cells"
               :key="i"
@@ -89,6 +91,12 @@ export default {
     title() {
       return `Game #${this.game.id}`
     },
+    gamePaused() {
+      return this.game.state == "paused";
+    },
+    gamePlayable() {
+      return this.gamePaused || this.game.state == "started";
+    },
     gameUrl() {
       return `/api/users/${this.userId}/games/${this.gameId}`;
     }
@@ -102,8 +110,8 @@ export default {
       this.$http.get(this.gameUrl)
         .then(response => {
           this.game = response.body.game;
-          this.cells = response.body.cells;
           this.plays = response.body.plays;
+          this.cells = response.body.cells;
           if (this.game.state == "pending") {
             this.gameMessage = "Start the game by clicking in any cell"
           } else {
@@ -122,20 +130,6 @@ export default {
       if (this.game.state == "started") this.sendGameAction("pause");
       this.$emit('clearGame');
     },
-    refreshCells() {
-      this.loading = true;
-      this.$http.get(`/api/users/${this.userId}/games/${this.game.id}/cells`)
-        .then(response => {
-          this.cells = response.body.cells;
-        })
-        .catch(error => {
-          console.log("cells error", error);
-          this.$alert(error.body.error, 'Error',  { confirmButtonText: 'OK' });
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    },
     getGridStyle() {
       return `grid-template-columns: repeat(${this.game.width}, 40px);`;
     },
@@ -145,13 +139,27 @@ export default {
     cycleCellFlag(cell) {
       this.sendCellAction(cell, "cycle_mark");
     },
+    pauseGame() {
+      this.sendGameAction("pause");
+    },
+    continueGame() {
+      this.sendGameAction("continue");
+    },
+    abandonGame() {
+      this.$confirm('Do you really want to abandon current game?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        this.sendGameAction('abandon');
+      }).catch(() => {});
+    },
     sendGameAction(action) {
       this.loading = true;
       const url = `${this.gameUrl}/execute`;
       this.$http.post(url, { game: { game_action: action } })
         .then(response => {
           this.game.state = response.body.game.state;
-          this.plays = response.body.plays;
           this.processResult(response.body.result);
         })
         .catch(error => {
@@ -165,8 +173,6 @@ export default {
     processResult(result) {
       if (!result) return;
       this.getGame();
-      // if (result == "start_game") this.refreshCells();
-      // if (result == "refresh_grid") this.refreshCells();
       if (result == "won") {
         this.$alert('Congratulations, you won!');
       }

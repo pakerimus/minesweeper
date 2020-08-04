@@ -46,11 +46,13 @@ module GameService
 
     def continue
       game.update(state: 'started', last_started_at: Time.zone.now)
+      @game_callback = "refresh_grid"
     end
 
     def abandon
       finish_with_state('abandoned')
       clear_all_cells
+      @game_callback = "refresh_grid"
     end
 
     def explode
