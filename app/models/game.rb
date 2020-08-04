@@ -1,6 +1,6 @@
 class Game < ApplicationRecord
   belongs_to :user
-  has_many :cells, dependent: :destroy
+  has_many :cells, dependent: :delete_all
 
   validates :width, :height, :bombs, :state, presence: true
   validates :width, :height, :bombs, numericality: {
