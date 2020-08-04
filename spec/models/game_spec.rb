@@ -35,7 +35,11 @@ RSpec.describe Game, type: :model do
     let!(:game) { create(:game) }
 
     it "creates the board after create" do
-      expect(game.cells.count).to eq (game.height * game.width)
+      expect(game.cells).not_to be_empty
+    end
+
+    it "deletes the board when destroyed" do
+      expect { game.destroy }.to change(game.cells, :count).from(game.board_size).to(0)
     end
   end
 
@@ -82,5 +86,66 @@ RSpec.describe Game, type: :model do
     it "does not place a bomb in the starting cell" do
       expect { place_bombs }.not_to change(starting_cell, :bomb)
     end
+  end
+
+  describe '#finished?' do
+    subject { game.finished? }
+
+    let(:state) { nil }
+    let(:game) { build(:game, state: state) }
+
+    context "when state is nil" do
+      it { is_expected.to be false }
+    end
+
+    context "when state is blank" do
+      let(:state) { '' }
+
+      it { is_expected.to be false }
+    end
+
+    context "when state equals pending" do
+      let(:state) { 'pending' }
+
+      it { is_expected.to be false }
+    end
+
+    context "when state equals started" do
+      let(:state) { 'started' }
+
+      it { is_expected.to be false }
+    end
+
+    context "when state equals paused" do
+      let(:state) { 'paused' }
+
+      it { is_expected.to be false }
+    end
+
+    context "when state equals abandoned" do
+      let(:state) { 'abandoned' }
+
+      it { is_expected.to be true }
+    end
+
+    context "when state equals lost" do
+      let(:state) { 'lost' }
+
+      it { is_expected.to be true }
+    end
+
+    context "when state equals won" do
+      let(:state) { 'won' }
+
+      it { is_expected.to be true }
+    end
+  end
+
+  describe '#board_size' do
+    subject { game.board_size }
+
+    let(:game) { build(:game, width: 20, height: 20) }
+
+    it { is_expected.to eq 400 }
   end
 end

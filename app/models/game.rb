@@ -30,6 +30,10 @@ class Game < ApplicationRecord
     GameService::Game.new(self).create_board!
   end
 
+  def board_size
+    height * width
+  end
+
   def available_plays
     cells.normal.not_cleared.count
   end
