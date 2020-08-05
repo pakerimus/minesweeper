@@ -73,21 +73,6 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  describe '#place_bombs' do
-    subject(:place_bombs) { game.place_bombs(starting_cell) }
-
-    let(:game) { create(:game) }
-    let(:starting_cell) { game.cells.sample }
-
-    it "places the correct amount of bombs" do
-      expect { place_bombs }.to change(game.cells.bombs, :count).from(0).to(game.bombs)
-    end
-
-    it "does not place a bomb in the starting cell" do
-      expect { place_bombs }.not_to change(starting_cell, :bomb)
-    end
-  end
-
   describe '#finished?' do
     subject { game.finished? }
 

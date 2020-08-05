@@ -85,4 +85,34 @@ RSpec.describe Cell, type: :model do
       expect { subject }.to change(cell_1, :adjacent_bombs).from(0).to(1)
     end
   end
+
+  describe '#can_be_cleared?' do
+    subject { cell.can_be_cleared? }
+
+    let(:cell) { build(:cell, cleared: cleared, mark: mark) }
+    let(:cleared) { false }
+    let(:mark) { 'no_mark' }
+
+    context "when cell is cleared" do
+      let(:cleared) { true }
+
+      it { is_expected.to be false }
+    end
+
+    context "when cell is not cleared and have question mark" do
+      let(:mark) { 'question' }
+
+      it { is_expected.to be false }
+    end
+
+    context "when cell is not cleared and have bomb mark" do
+      let(:mark) { 'with_bomb' }
+
+      it { is_expected.to be false }
+    end
+
+    context "when cell is not cleared and have no mark" do
+      it { is_expected.to be true }
+    end
+  end
 end

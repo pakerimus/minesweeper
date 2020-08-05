@@ -41,12 +41,4 @@ class Game < ApplicationRecord
   def finished?
     abandoned? || lost? || won?
   end
-
-  def place_bombs(starting_cell)
-    eligible_cells = cells.normal.where.not(id: starting_cell.adjacent_cells.pluck(:id))
-    bombs.times do
-      random_normal_cell = eligible_cells.reload.sample
-      random_normal_cell.place_bomb!
-    end
-  end
 end

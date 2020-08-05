@@ -35,7 +35,7 @@ module GameService
     end
 
     def start(starting_cell)
-      game.place_bombs(starting_cell)
+      place_bombs(starting_cell)
       game.cells.normal.map(&:calculate_adjacent_bombs)
       game.update(state: 'started', last_started_at: Time.zone.now)
     end
@@ -68,9 +68,18 @@ module GameService
       'won'
     end
 
+    def place_bombs(starting_cell)
+      eligible_cells = game.cells.normal.where.not(id: starting_cell.adjacent_cells.pluck(:id))
+      game.bombs.times do
+        random_normal_cell = eligible_cells.reload.sample
+        random_normal_cell.place_bomb!
+      end
+    end
+
     private
       def total_time
-        seconds = Time.zone.now - game.last_started_at
+        now = Time.zone.now
+        seconds = now - (game.last_started_at || now)
         game.total_time + seconds
       end
 
