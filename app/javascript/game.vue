@@ -94,8 +94,11 @@ export default {
     gamePaused() {
       return this.game.state == "paused";
     },
+    gameStarted() {
+      return this.game.state == "started";
+    },
     gamePlayable() {
-      return this.gamePaused || this.game.state == "started";
+      return this.gamePaused || this.gameStarted;
     },
     gameUrl() {
       return `/api/users/${this.userId}/games/${this.gameId}`;
@@ -134,6 +137,7 @@ export default {
       return `grid-template-columns: repeat(${this.game.width}, 40px);`;
     },
     clearCell(cell) {
+      if (cell.mark != "no_mark") return;
       this.sendCellAction(cell, "clear");
     },
     cycleCellFlag(cell) {
@@ -182,6 +186,7 @@ export default {
     },
     sendCellAction(cell, action) {
       if (cell.cleared) return;
+      if (this.game.state != "started" && this.game.state != "pending") return;
 
       this.loading = true;
       const url = `${this.gameUrl}/cells/${cell.id}/execute`;
