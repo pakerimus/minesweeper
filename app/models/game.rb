@@ -35,6 +35,8 @@ class Game < ApplicationRecord
   end
 
   def available_plays
+    return 0 if finished?
+
     cells.normal.not_cleared.count
   end
 

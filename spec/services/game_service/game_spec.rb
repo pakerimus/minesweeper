@@ -96,4 +96,57 @@ RSpec.describe GameService::Game, type: :service do
       it { expect { validate_action }.to raise_error(exception, err_msg) }
     end
   end
+
+  describe "#execute_action!" do
+    subject(:execute) { game_svc.execute_action! }
+
+    before { allow(game_svc).to receive(:validate_action!).and_return(nil) }
+
+    context "when pausing a game" do
+      let(:game_action) { 'pause' }
+
+      before { game.update(last_started_at: 30.seconds.ago) }
+
+      it { expect { execute }.to change(game, :paused?).to(true) }
+      it { expect { execute }.to change(game, :total_time).to(30) }
+      it { expect { execute }.to change(game, :last_started_at).to(nil) }
+      it { expect { execute }.not_to change(game, :finished?) }
+      it { expect { execute }.not_to change(game, :available_plays) }
+      it { expect { execute }.not_to change(game.cells.not_cleared, :count) }
+    end
+
+    context "when continuing a game" do
+      let(:game_action) { 'continue' }
+
+      it { expect { execute }.to change(game, :started?).to(true) }
+      it { expect { execute }.to change(game, :last_started_at) }
+      it { expect { execute }.not_to change(game, :total_time) }
+      it { expect { execute }.not_to change(game, :finished?) }
+      it { expect { execute }.not_to change(game, :available_plays) }
+      it { expect { execute }.not_to change(game.cells.not_cleared, :count) }
+
+      it "returns the action to refresh the grid" do
+        status, message = execute
+        expect(message).to eq 'refresh_grid'
+      end
+    end
+
+    context "when abandoning a game" do
+      let(:game_action) { 'abandon' }
+
+      before { game.update(state: 'started', last_started_at: 50.seconds.ago) }
+
+      it { expect { execute }.to change(game, :started?).to(false) }
+      it { expect { execute }.to change(game, :last_started_at).to(nil) }
+      it { expect { execute }.to change(game, :total_time).to(50) }
+      it { expect { execute }.to change(game, :finished?).from(false).to(true) }
+      it { expect { execute }.to change(game, :available_plays).to(0) }
+      it { expect { execute }.to change(game.cells.not_cleared, :count).to(0) }
+
+      it "returns the action to refresh the grid" do
+        status, message = execute
+        expect(message).to eq 'refresh_grid'
+      end
+    end
+  end
 end
