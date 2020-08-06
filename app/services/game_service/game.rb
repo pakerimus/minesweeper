@@ -51,7 +51,6 @@ module GameService
 
     def abandon
       finish_with_state('abandoned')
-      clear_all_cells
       @game_callback = "refresh_grid"
     end
 
@@ -63,7 +62,6 @@ module GameService
       return unless game.available_plays.zero?
 
       finish_with_state('won')
-      clear_all_cells
 
       'won'
     end
@@ -85,6 +83,7 @@ module GameService
 
       def finish_with_state(new_state)
         game.update(state: new_state, last_started_at: nil, total_time: total_time)
+        clear_all_cells
       end
 
       def clear_all_cells

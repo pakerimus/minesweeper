@@ -36,14 +36,14 @@ export default {
       }
     },
     cellColorClass() {
-      if (this.cell.cleared && this.cell.bomb) {
-        return "game-bomb";
-      } else if (this.cell.cleared && !this.cell.bomb) {
-        return "game-cleared";
-      } else if (this.cell.mark == "question") {
+      if (this.cell.mark == "question") {
         return "game-mark-with-question";
       } else if (this.cell.mark == "with_bomb") {
         return "game-mark-with-bomb";
+      } else if (this.cell.cleared && this.cell.bomb) {
+        return "game-bomb";
+      } else if (this.cell.cleared && !this.cell.bomb) {
+        return "game-cleared";
       } else {
         return "";
       }
