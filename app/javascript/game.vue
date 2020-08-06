@@ -70,7 +70,6 @@ export default {
   data: function () {
     return {
       loading: false,
-      gameMessage: null,
       timer: 0,
       plays: 0,
       game: {
@@ -83,7 +82,6 @@ export default {
         total_time: null,
         available_plays: null
       },
-      timer: 0,
       cells: []
     }
   },
@@ -96,6 +94,10 @@ export default {
     },
     gameStarted() {
       return this.game.state == "started";
+    },
+    gameMessage() {
+      if (this.game.state == "pending") return "Start the game by clicking in any cell";
+      return `Game ${this.game.state}`;
     },
     gamePlayable() {
       return this.gamePaused || this.gameStarted;
@@ -115,11 +117,6 @@ export default {
           this.game = response.body.game;
           this.plays = response.body.plays;
           this.cells = response.body.cells;
-          if (this.game.state == "pending") {
-            this.gameMessage = "Start the game by clicking in any cell"
-          } else {
-            this.gameMessage = `Game ${this.game.state}`;
-          }
         })
         .catch(error => {
           console.log("game error", error);
