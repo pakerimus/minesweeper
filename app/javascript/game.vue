@@ -71,6 +71,8 @@ export default {
     return {
       loading: false,
       timer: 0,
+      timerId: null,
+      timerStarted: false,
       plays: 0,
       game: {
         id: null,
@@ -112,11 +114,14 @@ export default {
   methods: {
     getGame() {
       this.loading = true;
+      let previousState = this.game.state;
       this.$http.get(this.gameUrl)
         .then(response => {
           this.game = response.body.game;
           this.plays = response.body.plays;
           this.cells = response.body.cells;
+          if (previousState != this.game.state) this.updateTimer();
+          if (this.gameStarted) this.startClock();
         })
         .catch(error => {
           console.log("game error", error);
@@ -142,6 +147,7 @@ export default {
     },
     pauseGame() {
       this.sendGameAction("pause");
+      this.stopClock();
     },
     continueGame() {
       this.sendGameAction("continue");
@@ -153,6 +159,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.sendGameAction('abandon');
+        this.stopClock();
       }).catch(() => {});
     },
     sendGameAction(action) {
@@ -175,9 +182,11 @@ export default {
       if (!result) return;
       this.getGame();
       if (result == "won") {
+        this.stopClock();
         this.$alert('Congratulations, you won!');
       }
       if (result == "explode") {
+        this.stopClock();
         this.$alert('You lost...');
       }
     },
@@ -202,6 +211,18 @@ export default {
         .finally(() => {
           this.loading = false;
         });
+    },
+    stopClock() {
+      clearInterval(this.timerId);
+      this.timerStarted = false;
+    },
+    startClock() {
+      if (this.timerStarted) return;
+      this.timerId = setInterval(() => { this.timer++;  }, 1000);
+      this.timerStarted = true;
+    },
+    updateTimer() {
+      this.timer = this.game.total_time;
     }
   }
 }
