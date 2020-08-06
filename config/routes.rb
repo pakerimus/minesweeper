@@ -1,11 +1,8 @@
 Rails.application.routes.draw do
-  namespace :api do
+  namespace :api, constraints: { format: 'json' } do
     resources :users, only: :create do
-      resources :games, only: [:index, :create, :show, :destroy] do
-        member { post :execute }
-        resources :cells, only: [:index, :show] do
-          member { post :execute }
-        end
+      resources :games, only: [:index, :create, :show, :update, :destroy] do
+        resources :cells, only: [:index, :show, :update]
       end
     end
   end

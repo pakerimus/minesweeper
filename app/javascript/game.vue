@@ -164,8 +164,7 @@ export default {
     },
     sendGameAction(action) {
       this.loading = true;
-      const url = `${this.gameUrl}/execute`;
-      this.$http.post(url, { game: { game_action: action } })
+      this.$http.patch(this.gameUrl, { game: { game_action: action } })
         .then(response => {
           this.game.state = response.body.game.state;
           this.processResult(response.body.result);
@@ -195,8 +194,8 @@ export default {
       if (this.game.state != "started" && this.game.state != "pending") return;
 
       this.loading = true;
-      const url = `${this.gameUrl}/cells/${cell.id}/execute`;
-      this.$http.post(url, { game: { cell_action: action } })
+      const url = `${this.gameUrl}/cells/${cell.id}`;
+      this.$http.patch(url, { game: { cell_action: action } })
         .then(response => {
           cell.cleared = response.body.cell.cleared;
           cell.mark = response.body.cell.mark;

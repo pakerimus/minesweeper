@@ -1,6 +1,6 @@
 class Api::CellsController < ApiController
   before_action :set_user_and_game
-  before_action :set_cell, only: [:show, :execute]
+  before_action :set_cell, only: [:show, :update]
 
   def index
     render json: { cells: @game.cells.for_grid }, status: 200
@@ -10,7 +10,7 @@ class Api::CellsController < ApiController
     render json: { cell: @cell }, status: 200
   end
 
-  def execute
+  def update
     cell_service = GameService::Cell.new(@game, @cell, **game_action_params)
     status, message = cell_service.execute_action!
     json_response = {

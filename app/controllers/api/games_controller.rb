@@ -1,6 +1,6 @@
 class Api::GamesController < ApiController
   before_action :set_user
-  before_action :set_game, only: [:show, :destroy, :execute]
+  before_action :set_game, only: [:show, :destroy, :update]
 
   def index
     render json: { games: @user.games }, status: 200
@@ -29,7 +29,7 @@ class Api::GamesController < ApiController
     head 200
   end
 
-  def execute
+  def update
     game_service = GameService::Game.new(@game, **game_action_params)
     status, message = game_service.execute_action!
     json_response = {

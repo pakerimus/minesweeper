@@ -51,7 +51,7 @@ RSpec.describe "Cells", type: :request do
     end
   end
 
-  describe "POST execute" do
+  describe "PATCH update" do
     context "when sending empty params" do
       xit "returns an error" do
 
