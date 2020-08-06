@@ -149,4 +149,54 @@ RSpec.describe GameService::Game, type: :service do
       end
     end
   end
+
+  describe '#start' do
+    subject(:start) { game_svc.start(cell) }
+
+    let(:cell) { game.cells.sample }
+
+    context "when starting cell is not provided" do
+      let(:cell) { nil }
+
+      it { expect { start }.to raise_error }
+    end
+
+    context "when starting cell is provided" do
+      it { expect { start }.to change(game.cells.bombs, :count) }
+      it { expect { start }.to change(game, :started?).from(false).to(true) }
+    end
+  end
+
+  describe '#explode' do
+    subject(:explode) { game_svc.explode }
+
+    it { expect { explode }.to change(game, :finished?).from(false).to(true) }
+    it { expect { explode }.to change(game, :available_plays).to(0) }
+    it { expect { explode }.to change(game.cells.not_cleared, :count).to(0) }
+    it { expect { explode }.to change(game, :lost?).from(false).to(true) }
+  end
+
+  describe '#calculate_remaining_plays' do
+    subject(:calculate) { game_svc.calculate_remaining_plays }
+
+    let(:cell) { game.cells.sample }
+
+    before { game_svc.place_bombs(cell) }
+
+    context "when user has cleared all cells" do
+      before do
+        game.cells.normal.not_cleared.update_all(cleared: true)
+      end
+
+      it { expect { calculate }.to change(game, :finished?).from(false).to(true) }
+      it { expect { calculate }.to change(game.cells.not_cleared, :count).to(0) }
+      it { expect { calculate }.to change(game, :won?).from(false).to(true) }
+      it { is_expected.to eq 'won' }
+    end
+
+    context "when user has remaining plays" do
+      it { expect { calculate }.not_to change(game, :state) }
+      it { is_expected.to be nil }
+    end
+  end
 end
