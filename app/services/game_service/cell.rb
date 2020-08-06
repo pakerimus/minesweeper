@@ -34,7 +34,6 @@ module GameService
 
     def clear
       if game.pending?
-        @cell_callback = "start_game"
         game_svc.start(cell)
         cell.reload
       end
