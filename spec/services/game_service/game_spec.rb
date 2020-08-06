@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GameService::Game, type: :service do
-  let(:game_svc) { described_class.new(game, options) }
+  let(:game_svc) { described_class.new(game, **options) }
   let(:game) { create(:game) }
   let(:options) { {} }
 
@@ -10,12 +10,22 @@ RSpec.describe GameService::Game, type: :service do
 
     let(:starting_cell) { game.cells.sample }
 
-    it "places the correct amount of bombs" do
-      expect { place_bombs }.to change(game.cells.bombs, :count).from(0).to(game.bombs)
+    context "when game has not bombs placed" do
+      it "places the correct amount of bombs" do
+        expect { place_bombs }.to change(game.cells.bombs, :count).from(0).to(game.bombs)
+      end
+
+      it "does not place a bomb in the starting cell" do
+        expect { place_bombs }.not_to change(starting_cell, :bomb)
+      end
     end
 
-    it "does not place a bomb in the starting cell" do
-      expect { place_bombs }.not_to change(starting_cell, :bomb)
+    context "when game already has placed bombs" do
+      before { place_bombs }
+
+      it "places the correct amount of bombs" do
+        expect { place_bombs }.not_to change(game.cells.bombs, :count)
+      end
     end
   end
 end

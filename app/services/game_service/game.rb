@@ -67,6 +67,8 @@ module GameService
     end
 
     def place_bombs(starting_cell)
+      return if game.cells.bombs.any?
+
       eligible_cells = game.cells.normal.where.not(id: starting_cell.adjacent_cells.pluck(:id))
       game.bombs.times do
         random_normal_cell = eligible_cells.reload.sample
