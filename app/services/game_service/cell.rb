@@ -2,10 +2,13 @@ module GameService
   class Cell
     attr_accessor :game, :cell, :options
 
+    class InvalidCellActionException < StandardError; end
+
     def initialize(game, cell, **options)
       @game = game
       @cell = cell
       @options = options
+      options["cell_action"] ||= ''
       @cell_callback = nil
     end
 
@@ -18,11 +21,11 @@ module GameService
     end
 
     def validate_action!
-      raise 'Invalid action' unless self.respond_to?(options["cell_action"].to_sym)
-      raise 'Not allowed: Game has finished' if game.finished?
-
-      raise 'Not allowed: cell cannot be cleared' if options["cell_action"] == "clear" && !cell.can_be_cleared?
-      raise 'Not allowed: cell is cleared' if options["cell_action"] == "cycle_mark" && cell.cleared?
+      raise InvalidCellActionException, 'Invalid action' unless self.respond_to?(options["cell_action"].to_sym)
+      raise InvalidCellActionException, 'Not allowed: Game has finished' if game.finished?
+      raise InvalidCellActionException, 'Not allowed: Game is paused' if game.paused?
+      raise InvalidCellActionException, 'Not allowed: cell cannot be cleared' if options["cell_action"] == 'clear' && !cell.can_be_cleared?
+      raise InvalidCellActionException, 'Not allowed: cell is cleared' if options["cell_action"] == 'cycle_mark' && cell.cleared?
     end
 
     def cycle_mark
