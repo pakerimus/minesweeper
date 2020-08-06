@@ -2,9 +2,12 @@ module GameService
   class Game
     attr_accessor :game, :options
 
+    class InvalidGameActionException < StandardError; end
+
     def initialize(game, **options)
       @game = game
       @options = options
+      @options["game_action"] ||= ''
       @game_callback = nil
     end
 
@@ -25,13 +28,12 @@ module GameService
     end
 
     def validate_action!
-      raise 'Invalid action' unless self.respond_to?(options["game_action"].to_sym)
-      raise 'Not allowed: Game has finished' if game.finished?
-
-      if ['start', 'continue'].include?(options["game_action"]) && game.started? ||
-         options["game_action"] == 'pause' && game.paused?
-        raise 'Not allowed: redundant'
-      end
+      raise InvalidGameActionException, 'Invalid action' unless self.respond_to?(options["game_action"].to_sym)
+      raise InvalidGameActionException, 'Not allowed: Action is reserved' if ['start', 'explode'].include?options["game_action"]
+      raise InvalidGameActionException, 'Not allowed: Game has finished' if game.finished?
+      raise InvalidGameActionException, 'Not allowed: Game has not started' if game.pending?
+      raise InvalidGameActionException, 'Not allowed: redundant' if options["game_action"] == 'continue' && game.started?
+      raise InvalidGameActionException, 'Not allowed: redundant' if options["game_action"] == 'pause' && game.paused?
     end
 
     def start(starting_cell)
